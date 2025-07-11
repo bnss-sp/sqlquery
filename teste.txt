@@ -1,0 +1,41 @@
+SELECT
+	A.cpf,
+	A.nb,
+	A.nome,
+	A.cid,
+	A.cid_resumo,
+	A.despacho,
+	A.especie,
+	A.faixa_salarial,
+	A.faixa_tempo_concessao,
+	A.sexo,
+	A.uf,
+	A.qt_duracao_beneficio_em_dias,
+	A.dt_dcb,
+	A.grau_instrucao,
+	D.escritorio_id as escritorio_baseprocesso,
+	E.cbo,
+	E.houve_afastamento,
+	E.local_do_acidente,
+	E.parte_do_corpo,
+	E.houve_internacao,
+	E.nat_lesao,
+	E.horas_trabalhadas,
+	E.cid as cid_cat,
+	E.area,
+	E.data_do_acidente,
+	E.tipo,
+	E.reg_policial,
+	E.devera_afastar,
+  IF(C.identificacao IS NOT NULL, 1, 0) AS trf_saida,
+  	B.estado AS estado_venda,
+	D.estado AS estado_processo
+ FROM NAGATO.nova_combas A
+INNER JOIN urano.base_venda B ON A.cpf = B.cpf
+LEFT JOIN TRF.trf_saida C ON A.cpf = C.identificacao
+LEFT JOIN urano.base_processo D ON B.cliente_id = D.cliente_id
+LEFT JOIN inss.base_cat E ON A.cpf = E.cpf
+WHERE (C.assunto LIKE '%DIREITO PREVIDENCI%' OR C.assunto IS NULL)
+  AND D.estado IN (
+    7, 8, 15, 75, 83, 112, 125
+  );
